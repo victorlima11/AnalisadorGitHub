@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import dotenv from "dotenv";
 
 dotenv.config();
+const API_URL = process.env.API_URL
 
 export default function Home() {
 
@@ -42,7 +43,7 @@ export default function Home() {
     }
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${value}`)
+      const response = await fetch(`${API_URL}/${value}`)
       const data = await response.json();
 
       if (!response.ok) {
