@@ -4,6 +4,9 @@ import { User, Flag, MessageCircleMore, Users, Github, Calendar } from "lucide-r
 import Resultado from "./componentes/Resultado";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export default function Home() {
 
@@ -39,7 +42,7 @@ export default function Home() {
     }
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/${value}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${value}`)
       const data = await response.json();
 
       if (!response.ok) {
