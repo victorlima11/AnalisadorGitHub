@@ -74,8 +74,11 @@ export default function Home() {
             required
             onChange={(e) => setValue(e.target.value)}
           />
-          <button onClick={handleAnalise} className="ml-2 bg-blue-500 text-white rounded-lg p-2 hover:cursor-pointer">
-            Analisar
+          <button
+            onClick={handleAnalise}
+            disabled={loading}
+            className={`ml-2 text-white rounded-lg p-2 transition duration-300  ${loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'} disabled:bg-gray-500 hover:cursor-pointer`}>
+            {loading ? "Analisando..." : "Analisar"}
           </button>
         </div>
       </div>
