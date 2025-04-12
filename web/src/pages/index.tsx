@@ -51,8 +51,8 @@ export default function Home() {
 
       setLoading(false);
       setData(data);
-      console.log(data);
     } catch (error) {
+      setLoading(false);
       setErroMessage("Erro ao buscar dados do usuário.");
       setErro(true);
     }

@@ -8,6 +8,8 @@ from google import genai
 
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_KEY")
+GITHUB_API_KEY = os.getenv("GITHUB_KEY")
+VERCEL_URL = os.getenv("VERCEL_URL")
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 
@@ -45,6 +47,8 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    VERCEL_URL
+    
 ]
 
 app.add_middleware(
@@ -58,11 +62,15 @@ app.add_middleware(
 
 @app.get("/{username}")
 def getGithubUser(username: str):
-    url = f"https://api.github.com/users/{username}"
-    response = requests.get(url)
 
-    url = f"https://api.github.com/users/{username}/repos"
-    response_repos = requests.get(url)
+    headers = {
+        "Authorization": f"Bearer {GITHUB_API_KEY}",
+    }
+    url = f"https://api.github.com/users/{username}"
+    response = requests.get(url, headers=headers)
+
+    url_repos = f"https://api.github.com/users/{username}/repos"
+    response_repos = requests.get(url_repos, headers=headers)
    
 
     if response.status_code != 200:
