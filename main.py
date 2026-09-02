@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import re
 import requests
 import os
 from dotenv import load_dotenv
@@ -44,12 +45,18 @@ AnalisadorParametro = (
 
 app = FastAPI()
 
+# VERCEL_URL pode nao estar definida em dev; None quebra a validacao do CORS.
 origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    VERCEL_URL
-    
+    origin
+    for origin in ["http://localhost:3000", "http://127.0.0.1:3000", VERCEL_URL]
+    if origin
 ]
+
+# Regra de nomes de usuario do GitHub: alfanumericos e hifens (nao no inicio/fim),
+# ate 39 caracteres. Impede que o path seja usado para montar outra URL da API.
+USERNAME_RE = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$")
+
+REQUEST_TIMEOUT = 10
 
 app.add_middleware(
     CORSMiddleware,
@@ -63,15 +70,22 @@ app.add_middleware(
 @app.get("/{username}")
 def getGithubUser(username: str):
 
-    headers = {
-        "Authorization": f"Bearer {GITHUB_API_KEY}",
-    }
+    if not USERNAME_RE.match(username):
+        return JSONResponse(
+            content={"erro": "Usuario invalido."},
+            status_code=400,
+        )
+
+    headers = {"Accept": "application/vnd.github+json"}
+    if GITHUB_API_KEY:
+        headers["Authorization"] = f"Bearer {GITHUB_API_KEY}"
+
     url = f"https://api.github.com/users/{username}"
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
 
     url_repos = f"https://api.github.com/users/{username}/repos"
-    response_repos = requests.get(url_repos, headers=headers)
-   
+    response_repos = requests.get(url_repos, headers=headers, timeout=REQUEST_TIMEOUT)
+
 
     if response.status_code != 200:
         return JSONResponse(

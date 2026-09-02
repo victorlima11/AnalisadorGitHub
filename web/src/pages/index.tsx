@@ -4,9 +4,6 @@ import { User, Flag, MessageCircleMore, Users, Github, Calendar } from "lucide-r
 import Resultado from "./componentes/Resultado";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export default function Home() {
 
